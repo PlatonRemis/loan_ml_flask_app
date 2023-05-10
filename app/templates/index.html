@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>Loan Application Form</title>
+    <style>
+        body {
+            text-align: center;
+            background-color: #393363;
+            font-family: sans-serif;
+        }
+
+        .container {
+            background: linear-gradient(to bottom, #fcac71, #fb846e);
+            border-radius: 10px;
+            padding: 20px;
+            width: 460px;
+            margin: 0 auto;
+            margin-bottom: 50px;
+            margin-top: 50px;
+            padding-left: 40px;
+            padding-right: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            margin-top: 50px;
+            color: white;
+        }
+
+        form {
+            display: inline-block;
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            color: white;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        input[type="number"],
+        select {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 10px;
+            border-width: 0px;  
+        }
+
+        input[type="number"]::placeholder,
+        input[type="text"]::placeholder {
+        color: lightgrey;
+        }
+
+        .input-comment {
+            font-size: 12px;
+            color: rgb(227, 227, 227);
+            max-width: 240px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        input[type="submit"] {
+            text-transform: uppercase;
+            margin-top: 40px;
+            margin-bottom: 50px;
+            padding: 20px 30px;
+            background-color: #783e75;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        .centered-button {
+        display: block;
+        margin: 0 auto;
+        }
+
+        #result {
+            margin-top: 50px;
+            padding: 20px;
+            color: white;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Loan Payback Probability Predictor</h1>
+    <div class="container">
+
+        <div id="result" class="{{ result_class }}">
+            Probability: {{ prediction }}%
+        </div>
+
+        <form method="POST">
+            <label for="int_rate">Interest Rate (%):</label>
+            <input type="number" step="0.01" min="0" max="100" name="int_rate" id="int_rate" placeholder="Percentage" required style="width: 240px;">
+
+            <label for="installment">Monthly Installment:</label>
+            <input type="number" step="0.01" min="0" name="installment" id="installment" placeholder="USD" required style="width: 240px;">
+
+            <label for="annual_inc">Annual Income:</label>
+            <input type="number" step="0.01" min="0" name="annual_inc" id="annual_inc" placeholder="USD" required style="width: 240px;">
+
+            <label for="dti">Debt-to-Income Ratio:</label>
+            <input type="number" step="0.01" min="0" name="dti" id="dti" placeholder="Percentage" required style="width: 240px;">
+            <div class="input-comment">Amount of total debt divided by gross annual income</div><br>
+            
+            <label for="fico">FICO Credit Score:</label>
+            <input type="number" step="1" name="fico" id="fico" placeholder="300-850" min="300" max="850" required style="width: 240px;">
+
+            <label for="days_with_cr_line">Days with Credit Line:</label>
+            <input type="number" step="1" min="0" name="days_with_cr_line" id="days_with_cr_line" placeholder="Number of days" required style="width: 240px;">
+            <div class="input-comment">Number of days the borrower has had a credit line</div><br>
+
+            <label for="revol_bal">Revolving Balance:</label>
+            <input type="number" step="0.01" min="0" name="revol_bal" id="revol_bal" placeholder="USD" required style="width: 240px;">
+            <div class="input-comment">Amount unpaid at the end of the credit card billing cycle</div><br>
+
+            <label for="revol_util">Revolving Line Utilization (%):</label>
+            <input type="number" step="0.01" min="0" max="100" name="revol_util" id="revol_util" placeholder="Percentage" required style="width: 240px;">
+            <div class="input-comment">Amount of the credit line used relative to total credit available</div><br>
+
+            <label for="inq_last_6mths">Inquiries in Last 6 Months:</label>
+            <input type="number" step="1" min="0" name="inq_last_6mths" id="inq_last_6mths" placeholder="Number of inquiries" required style="width: 240px;">
+            <div class="input-comment">Borrower's number of inquiries by creditors in the last 6 months</div><br>
+
+            <label for="delinq_2yrs">Delinquencies in Last 2 Years:</label>
+            <input type="number" step="1" min="0" name="delinq_2yrs" id="delinq_2yrs" placeholder="Number of delinquencies" required style="width: 240px;">
+            <div class="input-comment">Number of times the borrower had been 30+ days past due on a payment in the past 2 years</div><br>
+
+            <label for="pub_rec">Number of Public Records:</label>
+            <input type="number" step="1" min="0" name="pub_rec" id="pub_rec" placeholder="Number of public records" required style="width: 240px;">
+            <div class="input-comment">Borrower's number of derogatory public records (bankruptcy filings, tax liens, or judgments)</div><br>
+
+            <label for="purpose">Loan Purpose:</label>
+            <select name="purpose" id="purpose" required style="width: 254px;">
+                <option value="all_other">Other</option>
+                <option value="credit_card">Credit Card</option>
+                <option value="debt_consolidation">Debt Consolidation</option>
+                <option value="educational">Educational</option>
+                <option value="home_improvement">Home Improvement</option>
+                <option value="major_purchase">Major Purchase</option>
+                <option value="small_business">Small Business</option>
+            </select>
+
+            <input type="submit" value="Submit" class="centered-button">
+        </form>
+
+    </div>
+
+    <p style="font-size: 12px; color: rgb(227, 227, 227); width: 460px; text-align: center; margin: 0 auto; margin-bottom: 50px;">
+        This web app utilizes a neural network trained on a dataset of 10,000 cases to predict loan payback probability.
+        The neural network model has been trained using advanced machine learning techniques to analyze various factors
+        and provide accurate predictions. Accuracy of 86,73% on a test set that the model has never seen before.
+        <a href="https://www.linkedin.com/in/platon-remis-98150b259/" target="_blank" style="color: white">Creator's LinkedIn</a>
+    </p>
+
+
+    <script>
+        // Retrieve the normalized prediction value passed from Flask
+        var predictionNormalized = {{ prediction_normalized }};
+    
+        // Calculate the intermediate color based on the prediction value
+        var red = Math.round(255 * (1 - predictionNormalized));
+        var green = Math.round(255 * predictionNormalized);
+        var blue = 0;
+    
+        // Convert RGB values to hexadecimal
+        var colorHex = "#" + ((1 << 24) | (red << 16) | (green << 8) | blue).toString(16).slice(1);
+
+        // Set the background color of the <body> element
+        var resultElement = document.getElementById("result");
+        resultElement.style.backgroundColor = "rgba(" + red + ", " + green + ", " + blue + ", 0.5)";
+    </script>
+    
+</body>
+</html>
