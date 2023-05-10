@@ -21,7 +21,7 @@ def index():
         scaled_data_array = transform_user_inputs(user_inputs)
 
         # Loading the model and making a prediction
-        model = load_model('model.h5')
+        model = load_model('app/model.h5')
         prediction = model.predict(scaled_data_array)
         
         # As our model aswers the question "What is the probability of a loan NOT being paid off?",
@@ -65,7 +65,7 @@ def transform_user_inputs(user_inputs):
     data_array = np.concatenate([user_inputs_array, purpose_array, dti_pct, credit_utilization]).reshape(1, 20)
     
     # We are also scaling the data using the scaler we saved in the training step
-    scaler = load('scaler.joblib')
+    scaler = load('app/scaler.joblib')
     scaled_data_array = scaler.transform(data_array)
     
     return scaled_data_array
